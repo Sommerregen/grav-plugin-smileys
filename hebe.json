@@ -1,0 +1,15 @@
+{
+   "project":"grav-plugin-smileys",
+   "platforms":{
+      "grav":{
+         "nodes":{
+            "plugin":[
+               {
+                  "source":"/",
+                  "destination":"/user/plugins/smileys"
+               }
+            ]
+         }
+      }
+   }
+}
