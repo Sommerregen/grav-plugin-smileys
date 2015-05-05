@@ -1,0 +1,3 @@
+[submodule "assets/packs/simple_smileys"]
+	path = assets/packs/simple_smileys
+	url = https://github.com/Sommerregen/grav-data-smileys-simple-smileys.git
