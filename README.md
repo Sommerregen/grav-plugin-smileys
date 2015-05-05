@@ -4,32 +4,30 @@
 
 ## About
 
-Smileys, also known as "emoticons," is a pictorial representation of a facial expression to convey emotions in your writing. They are a great way to brighten up texts.
+Smileys, also known as "emoticons," are pictorial representation of facial expressions to convey emotions in your writing. They are a great way to brighten up texts.
 
 Text smileys are created by typing two or more punctuation marks. Some examples are:
 
 > :-) :D :'-( <3
 
-By default, [Grav Smileys Plugin][project] automatically converts text smileys to graphic images. When you type ;-) in your page you see smile emoticon when you preview or publish your page.
+By default, [Grav Smileys Plugin][project] automatically converts text smileys to graphic images. When you type ;-) in your page you see a smile emoticon when you preview or publish your page.
+
+![Screenshot Grav Smileys Plugin](assets/screenshot.png "Smileys Preview")
 
 Further it comes with a pre-configured set of example smileys (using [Grav Smileys Data Pack -- Simple Smileys](https://github.com/sommerregen/grav-data-smileys-simple-smileys)). An unlimited amount of custom smileys can be setup as well.
 
-If you want, you can add your own smileys by importing ready to use packages available around the internet (the list will be updated continuously):
+If you want, you can add your own smileys by importing ready to use packages available around the Internet. Currently available are:
 
 >  * **Simple Smileys** -- https://github.com/sommerregen/grav-data-smileys-simple-smileys
 >  * **Pidgin Smileys** -- https://github.com/sommerregen/grav-data-smileys-pidgin-smileys
 >  * **Tango** -- https://github.com/sommerregen/grav-data-smileys-tango
 >  * **Emoji** -- https://github.com/sommerregen/grav-data-smileys-emoji
 
-If you are interested in seeing this plugin in action, here is a screenshot:
-
-![Screenshot Grav Smileys Plugin](assets/screenshot.png "Smileys Preview")
-
 ## Installation and Updates
 
 Installing or updating the `Smileys` plugin can be done in one of two ways. Using the GPM (Grav Package Manager) installation method or manual install or update method by downloading [this plugin](https://github.com/sommerregen/grav-plugin-smileys) and extracting all plugin files to
 
-    /your/site/grav/user/plugins/smileys
+	/your/site/grav/user/plugins/smileys
 
 For more informations, please check the [Installation and update guide](docs/INSTALL.md).
 
@@ -73,7 +71,7 @@ to switch off `Smileys` plugin just for this page.
 
 Something you might want to do is to override the look and feel of the external links, and with Grav it is super easy.
 
-Copy the stylesheet [css/smileys.css](css/smileys.css) into the `css` folder of your custom theme, and add it to the list of CSS files.
+Copy the stylesheet [assets/css/smileys.css](assets/css/smileys.css) into the `css` folder of your custom theme and add it to the list of CSS files.
 
 ```
 /your/site/grav/user/themes/custom-theme/css/smileys.css
@@ -81,7 +79,7 @@ Copy the stylesheet [css/smileys.css](css/smileys.css) into the `css` folder of 
 
 After that set the `built_in_css` option of the `Smileys` plugin to `false`. That's it.
 
-You can now edit, override and tweak it however you prefer. The smiley images in are automatically given a CSS class of `smileys` when they are displayed in on a page. You can use this class to style your smileys differently from other images.
+You can now edit, override and tweak it however you prefer. Smiley images provide the CSS class `smileys` to style your smileys differently from other images.
 
 ## Contributing
 
