@@ -29,7 +29,8 @@ use RocketTheme\Toolbox\Event\Event;
  * This plugin substitutes text emoticons, also known as smilies
  * like :-), with images.
  */
-class SmileysPlugin extends Plugin {
+class SmileysPlugin extends Plugin
+{
   /**
    * @var SmileysPlugin
    */
@@ -57,7 +58,8 @@ class SmileysPlugin extends Plugin {
    * @return array    The list of events of the plugin of the form
    *                      'name' => ['method_name', priority].
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents()
+  {
     return [
       'onPluginsInitialized' => ['onPluginsInitialized', 0],
     ];
@@ -79,20 +81,20 @@ class SmileysPlugin extends Plugin {
     $pack_path = $locator->findResource('plugin://smileys/assets/packs');
 
     // Copy contents to user data folder
-    // $this->rCopy($pack_path, $data_path . DS . 'smileys');
-    Utils::rCopy($pack_path, $data_path . DS . 'smileys');
+    Utils::rCopy($pack_path, $data_path.DS.'smileys');
   }
 
   /**
    * Initialize configuration.
    */
-  public function onPluginsInitialized() {
-    if ( $this->isAdmin() ) {
-      $this->active = FALSE;
+  public function onPluginsInitialized()
+  {
+    if ($this->isAdmin()) {
+      $this->active = false;
       return;
     }
 
-    if ( $this->config->get('plugins.smileys.enabled') ) {
+    if ($this->config->get('plugins.smileys.enabled')) {
       // Get smiley package
       $package = $this->config->get('plugins.smileys.pack');
 
@@ -101,18 +103,18 @@ class SmileysPlugin extends Plugin {
       $smileys_path = $locator->findResource('user://data/smileys');
 
       // Call onPluginInstalled when user data smiley folder can not be found
-      if ( !$smileys_path ) {
+      if (!$smileys_path) {
         $this->onPluginInstalled();
       }
 
       // Check if package exists, if not fall-back to default smiley package
-      $path = $smileys_path . DS . $package;
-      if ( !file_exists($path) ) {
-        $path = $smileys_path . DS . 'simple_smileys';
+      $path = $smileys_path.DS.$package;
+      if (!file_exists($path)) {
+        $path = $smileys_path.DS.'simple_smileys';
       }
 
       // Load Smileys class
-      require_once(__DIR__ . '/classes/Smileys.php');
+      require_once(__DIR__.'/classes/Smileys.php');
       $this->smileys = new Smileys($package, $path);
 
       // Process contents order according to weight option
@@ -132,12 +134,13 @@ class SmileysPlugin extends Plugin {
    * @param  Event  $event The event when 'onPageContentProcessed' was
    *                       fired.
    */
-  public function onPageContentProcessed(Event $event) {
+  public function onPageContentProcessed(Event $event)
+  {
     /** @var Page $page */
     $page = $event['page'];
 
     $config = $this->mergeConfig($page);
-    if ( $config->get('process', FALSE) AND $this->compileOnce($page) ) {
+    if ($config->get('process', false) && $this->compileOnce($page)) {
       // Get content and list of exclude tags
       $content = $page->getRawContent();
       $exclude = $config->get('exclude');
@@ -153,8 +156,9 @@ class SmileysPlugin extends Plugin {
   /**
    * Set needed variables to display drop caps.
    */
-  public function onTwigSiteVariables() {
-    if ( $this->config->get('plugins.smileys.built_in_css') ) {
+  public function onTwigSiteVariables()
+  {
+    if ($this->config->get('plugins.smileys.built_in_css')) {
       $this->grav['assets']->add('plugin://smileys/assets/css/smileys.css');
     }
   }
@@ -168,55 +172,20 @@ class SmileysPlugin extends Plugin {
    * Checks if a page has already been compiled yet.
    *
    * @param  Page    $page The page to check
-   * @return boolean       Returns TRUE if page has already been
-   *                       compiled yet, FALSE otherwise
+   * @return boolean       Returns true if page has already been
+   *                       compiled yet, false otherwise
    */
-  protected function compileOnce(Page $page) {
-    static $processed = array();
+  protected function compileOnce(Page $page)
+  {
+    static $processed = [];
 
     $id = md5($page->path());
     // Make sure that contents is only processed once
-    if ( !isset($processed[$id]) OR ($processed[$id] < $page->modified()) ) {
+    if (!isset($processed[$id]) || ($processed[$id] < $page->modified())) {
       $processed[$id] = $page->modified();
-      return TRUE;
+      return true;
     }
 
-    return FALSE;
-  }
-
-  /**
-   * Recursively copy files from one directory to another.
-   *
-   * @param  string  $src   Source of files being copied
-   * @param  string  $dest  Destination of files being copied
-   * @return boolean        Returns TRUE on success, FALSE otherwise.
-   */
-  protected function rCopy($src, $dest) {
-
-    // If source is not a directory do a simple file copy
-    if ( !is_dir($src) ) {
-      copy($src, $dest);
-      return TRUE;
-    }
-
-    // If the destination directory does not exist create it
-    if ( !is_dir($dest) ) {
-      if ( !mkdir($dest) ) {
-        // If the destination directory could not be created stop processing
-        return FALSE;
-      }
-    }
-
-    // Open the source directory to read in files
-    $iterator = new \DirectoryIterator($src);
-    /** @var \DirectoryIterator $object */
-    foreach ( $iterator as $object ) {
-      if ( $object->isFile() ) {
-        copy($object->getRealPath(), "$dest/" . $object->getFilename());
-      } elseif ( !$object->isDot() AND $object->isDir() ) {
-        $this->rCopy($object->getRealPath(), "$dest/$object");
-      }
-    }
-    return TRUE;
+    return false;
   }
 }
