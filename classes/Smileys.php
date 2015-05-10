@@ -58,7 +58,8 @@ class Smileys {
    *
    * @param  string $path    The path to the smiley package
    */
-  public function __construct($package, $path) {
+  public function __construct($package, $path)
+  {
     $grav = static::getGrav();
     /** @var Cache $cache */
     $cache = $grav['cache'];
@@ -66,11 +67,11 @@ class Smileys {
     $debugger = $grav['debugger'];
 
     // Get cache id and try to fetch data
-    $id = @filemtime($path . DS . $package . YAML_EXT);
-    $cache_id = md5('smileys' . $id . $package . $cache->getKey());
+    $id = @filemtime($path.DS.$package.YAML_EXT);
+    $cache_id = md5('smileys'.$id.$package.$cache->getKey());
     $data = $cache->fetch($cache_id);
 
-    if ( $data === FALSE ) {
+    if ($data === false) {
       $debugger->addMessage("Smileys Plugin cache miss. Rebuilding...");
 
       // Load smileys from package
@@ -94,14 +95,15 @@ class Smileys {
    *
    * @return string          The processed content
    */
-  public function process($content, $exclude = []) {
+  public function process($content, $exclude = [])
+  {
     // Return contents on empty smileys array
-    if ( count($this->smileys) == 0) {
+    if (count($this->smileys) == 0) {
       return $content;
     }
 
     // Load PHP built-in DOMDocument class
-    if ( ($dom = $this->loadDOMDocument($content)) === NULL ) {
+    if (($dom = $this->loadDOMDocument($content)) === null) {
       return $content;
     }
 
@@ -113,10 +115,10 @@ class Smileys {
 
     // Run through each text node and replace any smiley acronyms by
     // their respective smiley images
-    $replace = array();
-    foreach ( $textnodes as $node ) {
+    $replace = [];
+    foreach ($textnodes as $node) {
       // Ignore text inside specific tags i.e. <code> and <pre>
-      if ( $this->skipNode($node, $exclude) ) {
+      if ($this->skipNode($node, $exclude)) {
         continue;
       }
 
@@ -127,8 +129,7 @@ class Smileys {
       $original = htmlspecialchars($node->textContent);
       $original = mb_encode_numericentity($original, $convmap, 'UTF-8');
 
-      $text = preg_replace_callback($this->regex,
-        array($this, 'getSmiley'), $original);
+      $text = preg_replace_callback($this->regex, [$this, 'getSmiley'], $original);
 
       // Save processed text
       $replace[$original] = $text;
@@ -153,17 +154,18 @@ class Smileys {
    * @return array           Returns the regular expressions and all
    *                         active smileys as an array
    */
-  protected function load($package, $path) {
+  protected function load($package, $path)
+  {
     /** @var UniformResourceLocator $locator */
     $locator = static::getGrav()['locator'];
 
     // Get path of smiley package relative to base root
     $base_url = static::getGrav()['base_url'];
-    $smiley_path = $locator->findResource('user://data/smileys/' . $package, FALSE);
-    if ( $smiley_path === FALSE ) {
+    $smiley_path = $locator->findResource('user://data/smileys/' . $package, false);
+    if ($smiley_path === false) {
       return array('', []);
     } else {
-      $base_url .= '/' . $smiley_path;
+      $base_url .= '/'.$smiley_path;
     }
 
     // Load blueprint
@@ -171,13 +173,13 @@ class Smileys {
 
     // Consider all images
     $ext = array('png', 'gif', 'bmp', 'tif', 'tiff', 'jpg', 'jpeg', 'svg');
-    $default = NULL;
+    $default = null;
 
     // By default if `items: @all` is set, add all images to smiley list
-    if ( $items = $blueprint->get('items') ) {
-      if ( $items === '@all' ) {
+    if ($items = $blueprint->get('items')) {
+      if ($items === '@all') {
         $default = array(
-          'enabled' => TRUE,
+          'enabled' => true,
           'acronyms' => '',
           'description' => ''
         );
@@ -188,12 +190,12 @@ class Smileys {
 
     // Load smileys, its acronyms and their descriptions
     $media = new Media($path);
-    $smileys = array();
+    $smileys = [];
 
     /** @var Grav\Common\Page\Media $media */
-    foreach ( $media->images() as $image ) {
+    foreach ($media->images() as $image) {
       // Discard smiley when extension is not in `items` list
-      if ( !in_array($image->get('extension'), $ext) ) {
+      if (!in_array($image->get('extension'), $ext)) {
         continue;
       }
 
@@ -201,10 +203,14 @@ class Smileys {
       $name = pathinfo($image->get('filename'), PATHINFO_FILENAME);
 
       // Filter out files and disabled smileys
-      if ( $smiley = $blueprint->get('smileys.' . $name, $default) ) {
-        $smiley += array('enabled' => TRUE, 'acronyms' => '',
-          'description' => '');
-        if ( !$smiley['enabled'] ) {
+      if ($smiley = $blueprint->get('smileys.'.$name, $default)) {
+        $smiley += array(
+          'enabled' => true,
+          'acronyms' => '',
+          'description' => ''
+        );
+
+        if (!$smiley['enabled']) {
           continue;
         }
 
@@ -213,14 +219,13 @@ class Smileys {
         $acronyms = array_filter(explode(' ', $smiley['acronyms']));
         $acronyms[] = ":$name:";
 
-        foreach ( $acronyms as $acronym ) {
+        foreach ($acronyms as $acronym) {
           // Escape acronym for image title attribute
           $acronym_escaped = htmlspecialchars($acronym, ENT_COMPAT | ENT_HTML401, 'UTF-8');
 
           // Set "alt" description and "title" attributes of image
-          $title = ltrim($smiley['description'] . " \xA1acronym_escaped\xA1");
-          $html = $image->html($acronym_escaped . '" title="' . $title,
-            'smileys', FALSE);
+          $title = ltrim($smiley['description']." \xA1acronym_escaped\xA1");
+          $html = $image->html($title, $acronym_escaped, 'smileys', false);
 
           // Store acronym
           $smileys[strtolower($acronym)] = array(
@@ -228,7 +233,7 @@ class Smileys {
           );
 
           // Eventually auto-escape forbidden characters for the user
-          if ( $acronym != $acronym_escaped ) {
+          if ($acronym != $acronym_escaped) {
             $smileys[$acronym_escaped] = $smileys[$acronym];
           }
         }
@@ -251,7 +256,8 @@ class Smileys {
    * @return array        Returns the content of the blueprint file
    *                      as a Data array.
    */
-  protected function loadBlueprint($key, $file) {
+  protected function loadBlueprint($key, $file)
+  {
     // Load blueprint
     $blueprints = new Blueprints($file);
     $blueprint = $blueprints->get($key);
@@ -267,9 +273,10 @@ class Smileys {
    * @return string          The regular expression which will match any
    *                         smileys from $smileys.
    */
-  protected function getRegex($smileys) {
+  protected function getRegex($smileys)
+  {
     // Do nothing on empty smileys array
-    if ( count($smileys) == 0 ) {
+    if (count($smileys) == 0) {
       return '';
     }
 
@@ -281,13 +288,13 @@ class Smileys {
     $subchar = '';
     $regex = '/(?:\s|^)';
     // Run through all smileys codes
-    foreach ( $smileys as $acronym => $smiley ) {
+    foreach ($smileys as $acronym => $smiley) {
       $firstchar = substr($acronym, 0, 1);
       $rest = substr($acronym, 1);
 
       // Check of new subpattern
-      if ( $firstchar != $subchar ) {
-        if ( $subchar != '' ) {
+      if ($firstchar != $subchar) {
+        if ($subchar != '') {
           $regex .= ')(?=\p{P}?(?:\s|$))|(?:\s|^)';
         }
 
@@ -310,34 +317,35 @@ class Smileys {
    * @param  DOMElement $node         A node from the DOMDocument
    * @param  array      $exclude      Array of tags and classes to be excluded
    *
-   * @return boolean                  Returns TRUE, if node should be
-   *                                  skipped, FALSE otherwise.
+   * @return boolean                  Returns true, if node should be
+   *                                  skipped, false otherwise.
    */
-  protected function skipNode($node, $exclude = []) {
+  protected function skipNode($node, $exclude = [])
+  {
     // Get owner document of node
     $body = $node->ownerDocument;
 
     // Check if node has specific class
-    if ( $node->parentNode->hasAttribute('class') ) {
+    if ($node->parentNode->hasAttribute('class')) {
       $class = $node->parentNode->getAttribute('class');
       $classes = array_filter(explode(' ', $class));
-      if ( !!array_intersect($classes, $exclude['classes']) ) {
-        return TRUE;
+      if (!!array_intersect($classes, $exclude['classes'])) {
+        return true;
       }
     }
 
     // Perform loop till node equals its owner document
-    while ( $node !== $body ) {
-      if ( in_array($node->nodeName, $exclude['tags']) ) {
+    while ($node !== $body) {
+      if (in_array($node->nodeName, $exclude['tags'])) {
         // We found a tag matching one in $exclude_tags
-        return TRUE;
+        return true;
       }
       // Investigate parent of node
       $node = $node->parentNode;
     }
 
     // The node definitely should not be excluded
-    return FALSE;
+    return false;
   }
 
   /**
@@ -348,7 +356,8 @@ class Smileys {
    *
    * @return string          A string to be returned
    */
-  protected function getSmiley($matches) {
+  protected function getSmiley($matches)
+  {
     $acronym = trim($matches[0]);
     $smiley = $this->smileys[strtolower($acronym)];
     $image = str_replace("\xA1acronym_escaped\xA1", $smiley['acronym'],
@@ -371,9 +380,10 @@ class Smileys {
    *
    * @return DOMDocument          DOMDocument object of content
    */
-  protected function loadDOMDocument($content) {
+  protected function loadDOMDocument($content)
+  {
     // Clear previous errors
-    if ( libxml_use_internal_errors(TRUE) === TRUE ) {
+    if (libxml_use_internal_errors(true) === true) {
       libxml_clear_errors();
     }
 
@@ -390,8 +400,8 @@ class Smileys {
     @$document->loadHTML($content);
 
     // Do nothing, if DOM is empty
-    if ( is_null($document->documentElement) ) {
-      return NULL;
+    if (is_null($document->documentElement)) {
+      return null;
     }
 
     return $document;
