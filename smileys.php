@@ -1,6 +1,6 @@
 <?php
 /**
- * Smileys v1.0.1
+ * Smileys v1.0.2
  *
  * This plugin substitutes text emoticons, also known as smilies
  * like :-), with images.
@@ -8,7 +8,7 @@
  * Licensed under MIT, see LICENSE.
  *
  * @package     Smileys
- * @version     1.0.1
+ * @version     1.0.2
  * @link        <https://github.com/sommerregen/grav-plugin-smileys>
  * @author      Benjamin Regler <sommerregen@benjamin-regler.de>
  * @copyright   2015, Benjamin Regler
@@ -18,9 +18,9 @@
 namespace Grav\Plugin;
 
 use Grav\Common\Grav;
-use Grav\Common\Utils;
 use Grav\Common\Plugin;
 use Grav\Common\Page\Page;
+use Grav\Common\Filesystem\Folder;
 use RocketTheme\Toolbox\Event\Event;
 
 /**
@@ -81,7 +81,7 @@ class SmileysPlugin extends Plugin
     $pack_path = $locator->findResource('plugin://smileys/assets/packs');
 
     // Copy contents to user data folder
-    Utils::rCopy($pack_path, $data_path.DS.'smileys');
+    Folder::rcopy($pack_path, $data_path.DS.'smileys');
   }
 
   /**

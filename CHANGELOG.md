@@ -1,3 +1,9 @@
+# v1.0.2
+## 05/12/2015
+
+2. [](#improved)
+	* Use `Folder::rCopy` instead of `Utils::rCopy` **(requires Grav 0.9.27+)**
+
 # v1.0.1
 ## 05/10/2015
 
