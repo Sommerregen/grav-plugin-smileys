@@ -220,6 +220,8 @@ class Smileys {
         $acronyms[] = ":$name:";
 
         foreach ($acronyms as $acronym) {
+          $acronym = strtolower($acronym);
+
           // Escape acronym for image title attribute
           $acronym_escaped = htmlspecialchars($acronym, ENT_COMPAT | ENT_HTML401, 'UTF-8');
 
@@ -228,7 +230,7 @@ class Smileys {
           $html = $image->html($title, $acronym_escaped, 'smileys', false);
 
           // Store acronym
-          $smileys[strtolower($acronym)] = array(
+          $smileys[$acronym] = array(
             'acronym' => $acronym_escaped, 'html' => $html,
           );
 
