@@ -2,15 +2,14 @@
 /**
  * Smileys
  *
- * Helper class to substitute text emoticons, also known as smilies
- * like :-), with images.
+ * This file is part of Grav Smileys plugin.
  *
- * Licensed under MIT, see LICENSE.
+ * Dual licensed under the MIT or GPL Version 3 licenses, see LICENSE.
+ * http://benjamin-regler.de/license/
  */
 
 namespace Grav\Plugin;
 
-use Grav\Common\Grav;
 use Grav\Common\GravTrait;
 use Grav\Common\Page\Media;
 use Grav\Common\Data\Blueprints;
@@ -67,8 +66,8 @@ class Smileys {
     $debugger = $grav['debugger'];
 
     // Get cache id and try to fetch data
-    $id = @filemtime($path.DS.$package.YAML_EXT);
-    $cache_id = md5('smileys'.$id.$package.$cache->getKey());
+    $id = @filemtime($path . DS . $package . YAML_EXT);
+    $cache_id = md5('smileys' . $id . $package . $cache->getKey());
     $data = $cache->fetch($cache_id);
 
     if ($data === false) {
@@ -165,7 +164,7 @@ class Smileys {
     if ($smiley_path === false) {
       return array('', []);
     } else {
-      $base_url .= '/'.$smiley_path;
+      $base_url .= '/' . $smiley_path;
     }
 
     // Load blueprint
@@ -203,7 +202,7 @@ class Smileys {
       $name = pathinfo($image->get('filename'), PATHINFO_FILENAME);
 
       // Filter out files and disabled smileys
-      if ($smiley = $blueprint->get('smileys.'.$name, $default)) {
+      if ($smiley = $blueprint->get('smileys.' . $name, $default)) {
         $smiley += array(
           'enabled' => true,
           'acronyms' => '',
@@ -224,11 +223,12 @@ class Smileys {
           $acronym_escaped = htmlspecialchars($acronym, ENT_COMPAT | ENT_HTML401, 'UTF-8');
 
           // Set "alt" description and "title" attributes of image
-          $title = ltrim($smiley['description']." \xA1acronym_escaped\xA1");
+          $title = ltrim($smiley['description'] . " \x1Aacronym_escaped\x1A");
           $html = $image->html($title, $acronym_escaped, 'smileys', false);
 
           // Store acronym
-          $smileys[strtolower($acronym)] = array(
+          $acronym = strtolower($acronym);
+          $smileys[$acronym] = array(
             'acronym' => $acronym_escaped, 'html' => $html,
           );
 
@@ -240,7 +240,7 @@ class Smileys {
       }
     }
 
-    // Create regex based on smiley set
+    // Create regex based on smileys set
     $regex = $this->getRegex($smileys);
 
     // Return regex and smileys as one data set
@@ -360,7 +360,7 @@ class Smileys {
   {
     $acronym = trim($matches[0]);
     $smiley = $this->smileys[strtolower($acronym)];
-    $image = str_replace("\xA1acronym_escaped\xA1", $smiley['acronym'],
+    $image = str_replace("\x1Aacronym_escaped\x1A", $smiley['acronym'],
       $smiley['html']);
 
     return str_ireplace($acronym, $image, $matches[0]);
@@ -391,8 +391,15 @@ class Smileys {
     $document = new \DOMDocument('1.0', 'UTF-8');
 
     // Encode contents as UTF-8, strip whitespaces & normalize newlines
-    $content = preg_replace(array('~\R~u', '~>[[:space:]]++<~m'),
-      array("\n", '><'), $content);
+    $content = mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8');
+
+    // $whitespaces = array(
+    //   '~\R~u' => "\n",         // Normalize new line
+    //   '~\>[^\S ]+~s' => '>',   // Strip whitespaces after tags, except space
+    //   '~[^\S ]+\<~s' => '<',   // Strip whitespaces before tags, except space
+    //   '~(\s)+~s' => '\\1'      // Shorten multiple whitespace sequences
+    // );
+    // $content = preg_replace(array_keys($whitespaces), $whitespaces, $content);
 
     // Parse the HTML using UTF-8
     // The @ before the method call suppresses any warnings that

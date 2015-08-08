@@ -1,23 +1,24 @@
 <?php
 /**
- * Smileys v1.0.2
+ * Smileys v1.1.0
  *
  * This plugin substitutes text emoticons, also known as smilies
  * like :-), with images.
  *
- * Licensed under MIT, see LICENSE.
+ * Dual licensed under the MIT or GPL Version 3 licenses, see LICENSE.
+ * http://benjamin-regler.de/license/
  *
  * @package     Smileys
- * @version     1.0.2
+ * @version     1.1.0
  * @link        <https://github.com/sommerregen/grav-plugin-smileys>
  * @author      Benjamin Regler <sommerregen@benjamin-regler.de>
  * @copyright   2015, Benjamin Regler
- * @license     <http://opensource.org/licenses/MIT>            MIT
+ * @license     <http://opensource.org/licenses/MIT>        MIT
+ * @license     <http://opensource.org/licenses/GPL-3.0>    GPLv3
  */
 
 namespace Grav\Plugin;
 
-use Grav\Common\Grav;
 use Grav\Common\Plugin;
 use Grav\Common\Page\Page;
 use Grav\Common\Filesystem\Folder;
@@ -61,7 +62,8 @@ class SmileysPlugin extends Plugin
   public static function getSubscribedEvents()
   {
     return [
-      'onPluginsInitialized' => ['onPluginsInitialized', 0],
+      'onBuildPagesInitialized' => ['onBuildPagesInitialized', 0],
+      'onTwigSiteVariables' => ['onTwigSiteVariables', 0],
     ];
   }
 
@@ -81,13 +83,13 @@ class SmileysPlugin extends Plugin
     $pack_path = $locator->findResource('plugin://smileys/assets/packs');
 
     // Copy contents to user data folder
-    Folder::rcopy($pack_path, $data_path.DS.'smileys');
+    Folder::rcopy($pack_path, $data_path . DS . 'smileys');
   }
 
   /**
    * Initialize configuration.
    */
-  public function onPluginsInitialized()
+  public function onBuildPagesInitialized()
   {
     if ($this->isAdmin()) {
       $this->active = false;
@@ -108,21 +110,20 @@ class SmileysPlugin extends Plugin
       }
 
       // Check if package exists, if not fall-back to default smiley package
-      $path = $smileys_path.DS.$package;
+      $path = $smileys_path . DS . $package;
       if (!file_exists($path)) {
-        $path = $smileys_path.DS.'simple_smileys';
+        $path = $smileys_path . DS . 'simple_smileys';
       }
 
       // Load Smileys class
-      require_once(__DIR__.'/classes/Smileys.php');
+      require_once(__DIR__ . '/classes/Smileys.php');
       $this->smileys = new Smileys($package, $path);
 
       // Process contents order according to weight option
       $weight = $this->config->get('plugins.smileys.weight');
 
       $this->enable([
-        'onPageContentProcessed' => ['onPageContentProcessed', $weight],
-        'onTwigSiteVariables' => ['onTwigSiteVariables', 0],
+        'onPageContentProcessed' => ['onPageContentProcessed', $weight]
       ]);
     }
   }
