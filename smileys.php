@@ -1,6 +1,6 @@
 <?php
 /**
- * Smileys v1.0.2
+ * Smileys v1.1.0
  *
  * This plugin substitutes text emoticons, also known as smilies
  * like :-), with images.
@@ -9,7 +9,7 @@
  * http://benjamin-regler.de/license/
  *
  * @package     Smileys
- * @version     1.0.2
+ * @version     1.1.0
  * @link        <https://github.com/sommerregen/grav-plugin-smileys>
  * @author      Benjamin Regler <sommerregen@benjamin-regler.de>
  * @copyright   2015, Benjamin Regler
