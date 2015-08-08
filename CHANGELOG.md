@@ -1,3 +1,16 @@
+# v1.1.0
+## 08/08/2015
+
+1. [](#new)
+  * Added admin configurations **(requires Grav 0.9.34+)**
+  * Added default title message for external links
+2. [](#improved)
+  * Switched to `onBuildPagesInitialized` event **(requires Grav 0.9.29+)**
+  * Updated `README.md`
+  * Include `Grav Data Smileys - Simple Smileys` into package
+3. [](#bugfix)
+  * Fixed [#1](https://github.com/Sommerregen/grav-plugin-smileys/issues/1) (Error while displaying unknown smiley)
+
 # v1.0.2
 ## 05/12/2015
 
