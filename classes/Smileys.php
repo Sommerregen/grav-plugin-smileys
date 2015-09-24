@@ -11,8 +11,9 @@
 namespace Grav\Plugin;
 
 use Grav\Common\GravTrait;
+use Grav\Common\Data\Data;
 use Grav\Common\Page\Media;
-use Grav\Common\Data\Blueprints;
+use Grav\Common\File\CompiledYamlFile;
 
 /**
  * Smileys
@@ -24,7 +25,7 @@ class Smileys {
   /**
    * @var Smileys
    */
-	use GravTrait;
+  use GravTrait;
 
   /** ---------------------------
    * Private/protected properties
@@ -60,8 +61,10 @@ class Smileys {
   public function __construct($package, $path)
   {
     $grav = static::getGrav();
+
     /** @var Cache $cache */
     $cache = $grav['cache'];
+
     /** @var Debugger $debugger */
     $debugger = $grav['debugger'];
 
@@ -155,35 +158,31 @@ class Smileys {
    */
   protected function load($package, $path)
   {
-    /** @var UniformResourceLocator $locator */
-    $locator = static::getGrav()['locator'];
-
-    // Get path of smiley package relative to base root
-    $base_url = static::getGrav()['base_url'];
-    $smiley_path = $locator->findResource('user://data/smileys/' . $package, false);
-    if ($smiley_path === false) {
+    // Don't try load something, which does not exits
+    if (!file_exists($path)) {
       return array('', []);
-    } else {
-      $base_url .= '/' . $smiley_path;
     }
 
-    // Load blueprint
-    $blueprint = $this->loadBlueprint($package, $path);
+    // Load YAML file
+    $file = $path . DS . $package . YAML_EXT;
+    $config = CompiledYamlFile::instance($file);
+    $config = new Data($config->content());
 
     // Consider all images
-    $ext = array('png', 'gif', 'bmp', 'tif', 'tiff', 'jpg', 'jpeg', 'svg');
-    $default = null;
+    $ext = ['png', 'gif', 'bmp', 'tif', 'tiff', 'jpg', 'jpeg', 'svg'];
+    $default = [];
 
     // By default if `items: @all` is set, add all images to smiley list
-    if ($items = $blueprint->get('items')) {
-      if ($items === '@all') {
-        $default = array(
+
+    if ($items = $config->get('items')) {
+      if ($items == '@all') {
+        $default = [
           'enabled' => true,
           'acronyms' => '',
           'description' => ''
-        );
+        ];
       } else {
-        $ext = (array) $blueprint->get('items');
+        $ext = $items;
       }
     }
 
@@ -193,49 +192,39 @@ class Smileys {
 
     /** @var Grav\Common\Page\Media $media */
     foreach ($media->images() as $image) {
-      // Discard smiley when extension is not in `items` list
-      if (!in_array($image->get('extension'), $ext)) {
+      // Get basename (without extension) of image
+      $name = pathinfo($image->get('filename'), PATHINFO_FILENAME);
+      $smiley = $config->get('smileys.' . $name, $default);
+      $smiley += $default;
+
+      // Filter out files, disabled smileys and smiley icons not in
+      // list of valid image extensions
+      if (!in_array($image->get('extension'), $ext) || !$smiley['enabled']) {
         continue;
       }
 
-      // Get basename (without extension) of image
-      $name = pathinfo($image->get('filename'), PATHINFO_FILENAME);
+      // Add smiley name as acronym like :name: where name is the
+      // filename of the smiley
+      $acronyms = array_filter(explode(' ', $smiley['acronyms']));
+      $acronyms[] = ":$name:";
 
-      // Filter out files and disabled smileys
-      if ($smiley = $blueprint->get('smileys.' . $name, $default)) {
-        $smiley += array(
-          'enabled' => true,
-          'acronyms' => '',
-          'description' => ''
+      foreach ($acronyms as $acronym) {
+        // Escape acronym for image title attribute
+        $acronym_escaped = htmlspecialchars($acronym, ENT_COMPAT | ENT_HTML401, 'UTF-8');
+
+        // Set "alt" description and "title" attributes of image
+        $title = ltrim($smiley['description'] . " \x1Aacronym_escaped\x1A");
+        $html = $image->html($title, $acronym_escaped, 'smileys', false);
+
+        // Store acronym
+        $acronym = strtolower($acronym);
+        $smileys[$acronym] = array(
+          'acronym' => $acronym_escaped, 'html' => $html,
         );
 
-        if (!$smiley['enabled']) {
-          continue;
-        }
-
-        // Add smiley name as acronym like :name: where name is the
-        // filename of the smiley
-        $acronyms = array_filter(explode(' ', $smiley['acronyms']));
-        $acronyms[] = ":$name:";
-
-        foreach ($acronyms as $acronym) {
-          // Escape acronym for image title attribute
-          $acronym_escaped = htmlspecialchars($acronym, ENT_COMPAT | ENT_HTML401, 'UTF-8');
-
-          // Set "alt" description and "title" attributes of image
-          $title = ltrim($smiley['description'] . " \x1Aacronym_escaped\x1A");
-          $html = $image->html($title, $acronym_escaped, 'smileys', false);
-
-          // Store acronym
-          $acronym = strtolower($acronym);
-          $smileys[$acronym] = array(
-            'acronym' => $acronym_escaped, 'html' => $html,
-          );
-
-          // Eventually auto-escape forbidden characters for the user
-          if ($acronym != $acronym_escaped) {
-            $smileys[$acronym_escaped] = $smileys[$acronym];
-          }
+        // Eventually auto-escape forbidden characters for the user
+        if ($acronym != $acronym_escaped) {
+          $smileys[$acronym_escaped] = $smileys[$acronym];
         }
       }
     }
@@ -245,24 +234,6 @@ class Smileys {
 
     // Return regex and smileys as one data set
     return array($regex, $smileys);
-  }
-
-  /**
-   * Load blueprint of a smiley package.
-   *
-   * @param  string $key  The key/name of the blueprint file
-   * @param  string $file The path to the blueprint file
-   *
-   * @return array        Returns the content of the blueprint file
-   *                      as a Data array.
-   */
-  protected function loadBlueprint($key, $file)
-  {
-    // Load blueprint
-    $blueprints = new Blueprints($file);
-    $blueprint = $blueprints->get($key);
-
-    return $blueprint;
   }
 
   /**
