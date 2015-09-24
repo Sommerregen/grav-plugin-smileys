@@ -1,6 +1,6 @@
 <?php
 /**
- * Smileys v1.1.0
+ * Smileys v1.2.0
  *
  * This plugin substitutes text emoticons, also known as smilies
  * like :-), with images.
@@ -9,7 +9,7 @@
  * http://benjamin-regler.de/license/
  *
  * @package     Smileys
- * @version     1.1.0
+ * @version     1.2.0
  * @link        <https://github.com/sommerregen/grav-plugin-smileys>
  * @author      Benjamin Regler <sommerregen@benjamin-regler.de>
  * @copyright   2015, Benjamin Regler
@@ -20,9 +20,11 @@
 namespace Grav\Plugin;
 
 use Grav\Common\Plugin;
+use Grav\Common\GravTrait;
 use Grav\Common\Page\Page;
 use Grav\Common\Filesystem\Folder;
 use RocketTheme\Toolbox\Event\Event;
+use Grav\Common\File\CompiledYamlFile;
 
 /**
  * Smileys
@@ -62,34 +64,14 @@ class SmileysPlugin extends Plugin
   public static function getSubscribedEvents()
   {
     return [
-      'onBuildPagesInitialized' => ['onBuildPagesInitialized', 0],
-      'onTwigSiteVariables' => ['onTwigSiteVariables', 0],
+      'onPluginsInitialized' => ['onPluginsInitialized', 0]
     ];
-  }
-
-  /**
-   * Install plugin and initialize configurations.
-   */
-  public function onPluginInstalled() {
-    /** @var Debugger $debugger */
-    $debugger = $this->grav['debugger'];
-
-    // Add debug informations of plugin install action
-    $debugger->addMessage("Smileys folder `user/data/smileys` not found. Creating...");
-
-    // Resolve path of default smiley package and smileys data path
-    $locator = $this->grav['locator'];
-    $data_path = $locator->findResource('user://data');
-    $pack_path = $locator->findResource('plugin://smileys/assets/packs');
-
-    // Copy contents to user data folder
-    Folder::rcopy($pack_path, $data_path . DS . 'smileys');
   }
 
   /**
    * Initialize configuration.
    */
-  public function onBuildPagesInitialized()
+  public function onPluginsInitialized()
   {
     if ($this->isAdmin()) {
       $this->active = false;
@@ -97,33 +79,12 @@ class SmileysPlugin extends Plugin
     }
 
     if ($this->config->get('plugins.smileys.enabled')) {
-      // Get smiley package
-      $package = $this->config->get('plugins.smileys.pack');
-
-      // Check if smiley package was properly installed in 'user/data/smileys'
-      $locator = $this->grav['locator'];
-      $smileys_path = $locator->findResource('user://data/smileys');
-
-      // Call onPluginInstalled when user data smiley folder can not be found
-      if (!$smileys_path) {
-        $this->onPluginInstalled();
-      }
-
-      // Check if package exists, if not fall-back to default smiley package
-      $path = $smileys_path . DS . $package;
-      if (!file_exists($path)) {
-        $path = $smileys_path . DS . 'simple_smileys';
-      }
-
-      // Load Smileys class
-      require_once(__DIR__ . '/classes/Smileys.php');
-      $this->smileys = new Smileys($package, $path);
-
       // Process contents order according to weight option
       $weight = $this->config->get('plugins.smileys.weight');
 
       $this->enable([
-        'onPageContentProcessed' => ['onPageContentProcessed', $weight]
+        'onPageContentProcessed' => ['onPageContentProcessed', $weight],
+        'onTwigSiteVariables' => ['onTwigSiteVariables', 0]
       ]);
     }
   }
@@ -149,7 +110,7 @@ class SmileysPlugin extends Plugin
       // Substitute smileys by their respective icons and save modified
       // page content
       $page->setRawContent(
-        $this->smileys->process($content, $exclude)
+        $this->init()->process($content, $exclude)
       );
     }
   }
@@ -162,6 +123,67 @@ class SmileysPlugin extends Plugin
     if ($this->config->get('plugins.smileys.built_in_css')) {
       $this->grav['assets']->add('plugin://smileys/assets/css/smileys.css');
     }
+  }
+
+  /**
+   * Install plugin and initialize configurations.
+   */
+  static public function onPluginInstalled() {
+    /** @var Grav $grav */
+    $grav = GravTrait::getGrav();
+
+    /** @var Debugger $debugger */
+    $debugger = $grav['debugger'];
+
+    // Resolve path of default smiley package and smileys data path
+    $locator = $grav['locator'];
+    if (!($path = $locator->findResource('user://data/smileys'))) {
+      // Add debug informations of plugin install action
+      $debugger->addMessage("Smileys folder `user/data/smileys` not found. Creating...");
+
+      $path = $locator->findResource('user://data') . DS . 'smileys';
+      mkdir($path, 0775, true);
+
+      // Copy contents to user data folder
+      $packs = $locator->findResource('plugin://smileys/assets/packs');
+      Folder::rcopy($packs, $path);
+    }
+  }
+
+  /**
+   * Get installed Smileys packages
+   *
+   * @return array An array of installed and available Smileys packages.
+   */
+  static public function getSmileyPacks()
+  {
+    // Resolve path of default smiley package and smileys data path
+    $locator = GravTrait::getGrav()['locator'];
+
+    // Path checks
+    if (!($path = $locator->findResource('user://data/smileys'))) {
+      $path = $locator->findResource('user://data') . DS . 'smileys';
+      self::onPluginInstalled();
+    }
+
+    $packs = [];
+    // Load all smileys from path
+    $iterator = new \FilesystemIterator($path);
+    foreach ($iterator as $object) {
+      if ($object->isDir()) {
+        $name = $text = $object->getBasename();
+
+        // Load name of Smiley package
+        $file = $object->getRealPath() . DS . $name . YAML_EXT;
+        if (file_exists($file)) {
+          $config = CompiledYamlFile::instance($file)->content();
+          $text = isset($config['name']) ? $config['name'] : $name;
+        }
+        $packs[$name] = $text;
+      }
+    }
+
+    return $packs;
   }
 
   /** -------------------------------
@@ -188,5 +210,39 @@ class SmileysPlugin extends Plugin
     }
 
     return false;
+  }
+
+  /**
+   * Initialize plugin and all dependencies.
+   *
+   * @return \Grav\Plugin\ExternalLinks   Returns ExternalLinks instance.
+   */
+  protected function init()
+  {
+    if (!$this->smileys) {
+      // Get smiley package
+      $package = $this->config->get('plugins.smileys.pack');
+
+      // Check if smiley package was properly installed in 'user/data/smileys'
+      $locator = $this->grav['locator'];
+      $smileys_path = $locator->findResource('user://data/smileys');
+
+      // Call onPluginInstalled when user data smiley folder can not be found
+      if (!$smileys_path) {
+        self::onPluginInstalled();
+      }
+
+      // Check if package exists, if not fall-back to default smiley package
+      $path = $smileys_path . DS . $package;
+      if (!file_exists($path)) {
+        $path = $smileys_path . DS . 'simple_smileys';
+      }
+
+      // Load and initialize Smileys class
+      require_once(__DIR__ . '/classes/Smileys.php');
+      $this->smileys = new Smileys($package, $path);
+    }
+
+    return $this->smileys;
   }
 }

@@ -1,0 +1,48 @@
+# German
+de:
+  PLUGINS:
+    SMILEYS:
+      GLOBAL_CONFIG: "Globale Einstellungen"
+      DEFAULT_CONFIG: "Standardeinstellungen für Smileys"
+      SPECIFIC_CONFIG:  "Globale und seitenspezifische Einstellungen"
+      PLUGIN_STATUS: "Plugin Status"
+      BUILTIN_CSS: "Verwende mitgeliefertes CSS"
+
+      WEIGHT: "Ausführungsreihenfolge"
+      WEIGHT_HELP: "Setze negative Werte um **Smileys** direkt nach *SmartyPants* ausführen zu lassen."
+
+      PACK: "Smileys-Paket"
+      PACK_HELP: "Der Smileys-Paketname leitet sich direkt aus dem Ordnernamen aus `user/data/smileys/<package>` ab."
+      PACK_DEFAULT: "- Kein Smileys-Paket ausgewählt -"
+
+      EXCLUDE:
+        TAGS: "Ignoriere Inhalt mit Tags"
+        TAGS_HELP: "Komma getrennte Liste von Tags."
+        CLASSES: "Ignoriere Inhalt mit Klassen"
+        CLASSES_HELP: "Komma getrennte Liste von Klassen."
+
+      PROCESS: "Aktiviere <code>Smileys</code>-Filter auf Seite"
+
+# English
+en:
+  PLUGINS:
+    SMILEYS:
+      GLOBAL_CONFIG: "Global plugin configurations"
+      DEFAULT_CONFIG: "Default values for Smileys configuration"
+      SPECIFIC_CONFIG: "Global and page specific configurations"
+      PLUGIN_STATUS: "Plugin status"
+      BUILTIN_CSS: "Use built in CSS"
+      WEIGHT: "Order of execution"
+      WEIGHT_HELP: "To process the page contents right after *SmartyPants* use negative values."
+
+      PACK: "Smileys package"
+      PACK_HELP: "The name of the smileys package equals the name of the folder in `user/data/smileys/<package>`."
+      PACK_DEFAULT: "- No Smileys package selected -"
+
+      EXCLUDE:
+        TAGS: "Ignore contents with this tags"
+        TAGS_HELP: "Comma separated list."
+        CLASSES: "Ignore contents with this class"
+        CLASSES_HELP: "Comma separated list."
+
+      PROCESS: "Activate <code>Smileys</code> filter on the page"

@@ -1,3 +1,12 @@
+# v1.2.0
+## 09/XX/2015
+
+2. [](#improved)
+  * Added blueprints for Grav Admin plugin
+  * Improved performance of Smileys creation
+3. [](#bugfix)
+  * Fixed broken smileys after the page has been cached
+
 # v1.1.0
 ## 08/08/2015
 
@@ -15,13 +24,13 @@
 ## 05/12/2015
 
 2. [](#improved)
-	* Use `Folder::rCopy` instead of `Utils::rCopy` **(requires Grav 0.9.27+)**
+  * Use `Folder::rCopy` instead of `Utils::rCopy` **(requires Grav 0.9.27+)**
 
 # v1.0.1
 ## 05/10/2015
 
 2. [](#improved)
-	* PSR fixes
+  * PSR fixes
   * Re-factored code
   * Use `Simple Smileys` data pack now as a sub module
 3. [](#bugfix)

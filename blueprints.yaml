@@ -1,5 +1,5 @@
 name: Smileys
-version: 1.1.0
+version: 1.2.0
 description: "This plugin substitutes text emoticons, also known as smilies like :-), with images."
 icon: smile-o
 author:
@@ -16,37 +16,38 @@ form:
   fields:
     global:
       type: section
-      title: "Global plugin configurations"
+      title: PLUGINS.SMILEYS.GLOBAL_CONFIG
       underline: 1
 
       fields:
         enabled:
           type: toggle
-          label: "Plugin Status"
+          label: PLUGINS.SMILEYS.PLUGIN_STATUS
           highlight: 1
           default: 0
           options:
-            1: Enabled
-            0: Disabled
+            1: PLUGIN_ADMIN.ENABLED
+            0: PLUGIN_ADMIN.DISABLED
           validate:
             type: bool
 
         built_in_css:
           type: toggle
-          label: "Use built in CSS"
+          label: PLUGINS.SMILEYS.BUILTIN_CSS
           highlight: 1
           default: 1
           options:
-            1: "Yes"
-            0: "No"
+            1: PLUGIN_ADMIN.YES
+            0: PLUGIN_ADMIN.NO
           validate:
             type: bool
 
         weight:
           type: text
           size: x-small
-          label: "Order of execution"
-          default: 0
+          label: PLUGINS.SMILEYS.WEIGHT
+          help: PLUGINS.SMILEYS.WEIGHT_HELP
+          default: 1
           validate:
             type: int
             min: -100
@@ -54,46 +55,51 @@ form:
 
     default:
       type: section
-      title: "Default values for Smileys configuration"
+      title: PLUGINS.SMILEYS.DEFAULT_CONFIG
       underline: 1
 
       fields:
         pack:
-          type: text
+          type: select
           size: medium
-          label: "Enter the name of the smileys package"
-          help: "The name of the smileys package equals the name of the folder in `user/data/smileys/<package>`."
-          default: simple_smileys
-          placeholder: simple_smileys
+          label: PLUGINS.SMILEYS.PACK
+          help: PLUGINS.SMILEYS.PACK_HELP
+          @data-options: '\Grav\Plugin\SmileysPlugin::getSmileyPacks'
+          default: ""
+          options:
+            "": PLUGINS.SMILEYS.PACK_DEFAULT
+          validate:
+            required: true
+            type: string
 
     specific:
       type: section
-      title: "Global and page specific configurations"
+      title: PLUGINS.SMILEYS.SPECIFIC_CONFIG
       underline: 1
 
       fields:
         exclude.tags:
           type: selectize
           size: medium
-          label: "Ignore contents with this tags"
-          help: Comma separated list.
+          label: PLUGINS.SMILEYS.EXCLUDE.TAGS
+          help: PLUGINS.SMILEYS.EXCLUDE.TAGS_HELP
           validate:
             type: commalist
 
         exclude.classes:
           type: selectize
           size: medium
-          label: "Ignore contents with this class"
-          help: Comma separated list.
+          label: PLUGINS.SMILEYS.EXCLUDE.CLASSES
+          help: PLUGINS.SMILEYS.EXCLUDE.CLASSES_HELP
           validate:
             type: commalist
 
         process:
           type: toggle
-          label: "Activate <code>Smileys</code> filter per page"
+          label: PLUGINS.SMILEYS.PROCESS
           default: 1
           options:
-            1: "Yes"
-            0: "No"
+            1: PLUGIN_ADMIN.YES
+            0: PLUGIN_ADMIN.NO
           validate:
             type: bool
