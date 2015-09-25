@@ -1,5 +1,5 @@
 # v1.2.0
-## 09/XX/2015
+## 09/24/2015
 
 2. [](#improved)
   * Added blueprints for Grav Admin plugin
