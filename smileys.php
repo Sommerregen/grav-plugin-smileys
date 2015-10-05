@@ -132,15 +132,9 @@ class SmileysPlugin extends Plugin
     /** @var Grav $grav */
     $grav = GravTrait::getGrav();
 
-    /** @var Debugger $debugger */
-    $debugger = $grav['debugger'];
-
     // Resolve path of default smiley package and smileys data path
     $locator = $grav['locator'];
     if (!($path = $locator->findResource('user://data/smileys'))) {
-      // Add debug informations of plugin install action
-      $debugger->addMessage("Smileys folder `user/data/smileys` not found. Creating...");
-
       $path = $locator->findResource('user://data') . DS . 'smileys';
       mkdir($path, 0775, true);
 
