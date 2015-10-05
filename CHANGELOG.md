@@ -1,3 +1,9 @@
+# v1.2.1
+## 10/05/2015
+
+3. [](#bugfix)
+  * Fixed [#2](https://github.com/Sommerregen/grav-plugin-smileys/pull/2) (Remove debugger calls. When called from gpm, it gave an error)
+
 # v1.2.0
 ## 09/24/2015
 
