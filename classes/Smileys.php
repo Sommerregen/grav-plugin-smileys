@@ -196,10 +196,12 @@ class Smileys {
       $name = pathinfo($image->get('filename'), PATHINFO_FILENAME);
       $smiley = $config->get('smileys.' . $name, $default);
       $smiley += $default;
+      
+      $enabled = isset($smiley['enabled']) ? $smiley['enabled'] : false;
 
       // Filter out files, disabled smileys and smiley icons not in
       // list of valid image extensions
-      if (!in_array($image->get('extension'), $ext) || !$smiley['enabled']) {
+      if (!in_array($image->get('extension'), $ext) || !$enabled) {
         continue;
       }
 
