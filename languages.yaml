@@ -46,3 +46,27 @@ en:
         CLASSES_HELP: "Comma separated list."
 
       PROCESS: "Activate <code>Smileys</code> filter on the page"
+
+# French
+fr:
+  PLUGINS:
+    SMILEYS:
+      GLOBAL_CONFIG: "Configurations générales du plugin"
+      DEFAULT_CONFIG: "Valeurs par défaut pour la configuration des émoticônes"
+      SPECIFIC_CONFIG: "Configurations générales et spécifiques des pages"
+      PLUGIN_STATUS: "Statut du plugin"
+      BUILTIN_CSS: "Utiliser les CSS intégrés"
+      WEIGHT: "Ordre de l'exécution"
+      WEIGHT_HELP: "Pour traiter les contenus de la page juste après *SmartyPants*, utilisez des valeurs négatives."
+
+      PACK: "Paquet d'émoticônes"
+      PACK_HELP: "Le nom du paquet d'émoticônes doit être identique au nom du dossier dans `user/data/smileys/<paquet>`."
+      PACK_DEFAULT: "- Aucun paquet d'émoticônes sélectionné -"
+
+      EXCLUDE:
+        TAGS: "Ignorer les contenus avec ces tags"
+        TAGS_HELP: "Liste séparée par des virgules."
+        CLASSES: "Ignorer les contenus avec cette classe"
+        CLASSES_HELP: "Liste séparée par des virgules."
+
+      PROCESS: "Activer le filtre <code>émoticônes</code> pour cette page"
