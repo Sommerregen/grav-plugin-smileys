@@ -123,7 +123,7 @@ smileys:
     acronyms: ">_< X| X-|"
     description: "irritated"
 
-  irritated-2:
+  irritated_2:
     enabled: true
     acronyms: ">.< X. X-."
     description: "irritated"
@@ -188,10 +188,10 @@ smileys:
     acronyms: ":-| :| =| =-| :undecided:"
     description: "speechless"
 
-  spriteful:
+  spiteful:
     enabled: true
     acronyms: "D) D-) D] D-]"
-    description: "spriteful"
+    description: "spiteful"
 
   stupid:
     enabled: true
